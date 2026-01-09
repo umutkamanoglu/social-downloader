@@ -1,13 +1,58 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { Text } from 'react-native';
-
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { useState } from "react";
 import './global.css';
+import { Header } from 'components/Header';
 
 export default function App() {
+  const [url, setUrl] = useState("");
+
+  const handeDownload = async (postUrl: string) => {
+    console.log(postUrl)
+  }
+
   return (
-    <SafeAreaView>
-      <Text>Demo</Text>
+    <SafeAreaView className='flex-1 bg-neutral-100'>
+      <View className="flex-1 p-5">
+        {/* Header */}
+        <Header />
+
+        {/* Input Card */}
+        <View className="bg-white rounded-2xl p-4 shadow-sm">
+          <Text className="text-sm text-neutral-600 mb-2">
+            Gönderi Linki
+          </Text>
+
+          <TextInput
+            value={url}
+            onChangeText={setUrl}
+            placeholder="https://www.tiktok.com/..."
+            placeholderTextColor="#9ca3af"
+            className="border border-neutral-200 rounded-xl px-4 py-3 text-neutral-900"
+          />
+        </View>
+
+        {/* Download Button */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            handeDownload(url)
+          }}
+          className="bg-black rounded-2xl py-4 mt-6 items-center"
+        >
+          <Text className="text-white font-semibold text-base">
+            Videoyu İndir
+          </Text>
+        </TouchableOpacity>
+
+        {/* Info Box */}
+        <View className="mt-6 bg-neutral-200/50 rounded-xl p-4">
+          <Text className="text-neutral-600 text-sm text-center">
+            Linki yapıştır ve indirmeye başla 🚀
+          </Text>
+        </View>
+      </View>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
