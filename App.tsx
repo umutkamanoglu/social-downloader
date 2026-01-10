@@ -51,6 +51,13 @@ export default function App() {
       setData(result);
       console.log("TikTok Download Result:", result);
     }
+
+    else if (platform == "instagram") {
+      setPostType("instagram");
+      const result: any = await downloader.instagram(postUrl);
+      setData(result);
+      console.log("Instagram Download Result:", result);
+    }
   }
 
   return (

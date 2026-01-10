@@ -1,5 +1,6 @@
 export class Downloader {
-    static tiktokUrl = "https://tikdownloader.io/api/ajaxSearch"
+    static tiktokUrl = "https://tikdownloader.io/api/ajaxSearch";
+    static instagramUrl = "https://thesocialcat.com/api/instagram-download";
 
     parseHTML(html) {
         const result = {
@@ -8,50 +9,36 @@ export class Downloader {
             downloads: []
         };
 
-        // Title çıkar
-        const titleMatch = html.match(/<h3>(.*?)<\/h3>/);
+        // Title
+        const titleMatch = html.match(/<h3[^>]*>(.*?)<\/h3>/i);
         if (titleMatch) {
-            result.title = titleMatch[1]
-                .replace(/&#x1F602;/g, '😂')
-                .replace(/&amp;/g, '&')
-                .trim();
+            result.title = titleMatch[1].trim();
         }
 
-        // Thumbnail çıkar
-        const thumbnailMatch = html.match(/<div class="thumbnail">[\s\S]*?<img src="([^"]+)"/);
-        if (thumbnailMatch) {
-            result.thumbnail = thumbnailMatch[1];
+        // Thumbnail
+        const thumbMatch = html.match(/<img[^>]+src="([^"]+)"/i);
+        if (thumbMatch) {
+            result.thumbnail = thumbMatch[1];
         }
 
-        // Video/Audio indirme linklerini çıkar
-        const downloadRegex = /<a href="([^"]+)"[^>]*class="tik-button-dl[^"]*"[^>]*>[\s\S]*?<\/i>\s*([^<]+)<\/a>/g;
+        // Download linkleri
+        const linkRegex =
+            /<a[^>]+href="([^"]+)"[^>]*>(?:\s*<[^>]+>)*([^<]+)<\/a>/gi;
+
         let match;
-
-        while ((match = downloadRegex.exec(html)) !== null) {
+        while ((match = linkRegex.exec(html)) !== null) {
             const url = match[1];
-            const text = match[2].trim();
+            const text = match[2]?.trim();
 
-            // Boş veya # olan URL'leri ekleme
-            if (url && url !== "#") {
-                result.downloads.push({ text, url });
-            }
-        }
-
-        // Photo mode downloads (eğer varsa)
-        const photoRegex = /<div class="photo-list[\s\S]*?<\/div>/;
-        const photoSection = html.match(photoRegex);
-
-        if (photoSection) {
-            const photoLinkRegex = /<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g;
-            let photoMatch;
-
-            while ((photoMatch = photoLinkRegex.exec(photoSection[0])) !== null) {
-                const url = photoMatch[1];
-                const text = photoMatch[2].trim();
-
-                if (url && url !== "#") {
-                    result.downloads.push({ text, url });
-                }
+            if (
+                url &&
+                url !== "#" &&
+                (url.startsWith("http") || url.startsWith("https"))
+            ) {
+                result.downloads.push({
+                    text: text || "Download",
+                    url
+                });
             }
         }
 
@@ -63,14 +50,14 @@ export class Downloader {
             const request = await fetch(Downloader.tiktokUrl, {
                 method: "POST",
                 headers: {
-                    'accept': '*/*',
-                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                    'x-requested-with': 'XMLHttpRequest',
-                    'Referer': 'https://tikdownloader.io/en',
+                    accept: "*/*",
+                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "x-requested-with": "XMLHttpRequest",
+                    Referer: "https://tikdownloader.io/en"
                 },
                 body: new URLSearchParams({
                     q: videoUrl,
-                    lang: 'en'
+                    lang: "en"
                 }).toString()
             });
 
@@ -80,15 +67,37 @@ export class Downloader {
                 throw new Error("Video bulunamadı");
             }
 
-            const parsed = this.parseHTML(response.data);
-
             return {
                 status: response.status,
-                ...parsed
+                ...this.parseHTML(response.data)
             };
+        } catch (error) {
+            console.error("TikTok indirme hatası:", error);
+            throw error;
+        }
+    }
+
+    async instagram(postUrl) {
+        try {
+            const response = await fetch(
+                "https://thesocialcat.com/api/instagram-download",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json"
+                    },
+                    body: JSON.stringify({
+                        url: postUrl
+                    })
+                }
+            );
+
+            const result = await response.json();
+            return result;
 
         } catch (error) {
-            console.error('TikTok indirme hatası:', error);
+            console.error("Instagram download error:", error);
             throw error;
         }
     }
