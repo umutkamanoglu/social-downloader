@@ -4,10 +4,13 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import './global.css';
 import { Header } from 'components/Header';
+import { Downloader } from 'services/Downloader';
 
 export default function App() {
   const [url, setUrl] = useState("");
-
+  const [data, setData] = useState(null);
+  const [postType, setPostType] = useState<"youtube" | "instagram" | "tiktok" | null>(null);
+  const downloader = new Downloader();
   type SocialPlatforms = "youtube" | "instagram" | "tiktok";
 
   const linkDedector = (url: string): SocialPlatforms | null => {
@@ -41,7 +44,13 @@ export default function App() {
   };
 
   const handeDownload = async (postUrl: string) => {
-    console.log(linkDedector(postUrl));
+    const platform = await linkDedector(postUrl);
+    if (platform == "tiktok") {
+      setPostType("tiktok");
+      const result: any = await downloader.tiktok(postUrl);
+      setData(result);
+      console.log("TikTok Download Result:", result);
+    }
   }
 
   return (
