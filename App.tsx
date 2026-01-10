@@ -1,6 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import ToastManager, { Toast } from 'toastify-react-native'
 import { useState } from "react";
 import './global.css';
 import { Header } from 'components/Header';
@@ -102,6 +103,7 @@ export default function App() {
         </View>
       </View>
       <StatusBar style="auto" />
+      <ToastManager />
     </SafeAreaView>
   );
 }
