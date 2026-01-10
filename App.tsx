@@ -8,8 +8,40 @@ import { Header } from 'components/Header';
 export default function App() {
   const [url, setUrl] = useState("");
 
+  type SocialPlatforms = "youtube" | "instagram" | "tiktok";
+
+  const linkDedector = (url: string): SocialPlatforms | null => {
+    if (!url || typeof url !== "string") return null;
+
+    const normalizedUrl = url.toLowerCase().trim();
+
+    const patterns: Record<SocialPlatforms, RegExp[]> = {
+      youtube: [
+        /^(https?:\/\/)?(www\.)?(m\.)?youtube\.com\/.+/,
+        /^(https?:\/\/)?(www\.)?youtu\.be\/.+/
+      ],
+      instagram: [
+        /^(https?:\/\/)?(www\.)?instagram\.com\/.+/,
+        /^(https?:\/\/)?(www\.)?instagr\.am\/.+/
+      ],
+      tiktok: [
+        /^(https?:\/\/)?(www\.)?tiktok\.com\/.+/,
+        /^(https?:\/\/)?(vm|vt)\.tiktok\.com\/.+/
+      ]
+    };
+
+    for (const platform in patterns) {
+      const key = platform as SocialPlatforms;
+      if (patterns[key].some((regex) => regex.test(normalizedUrl))) {
+        return key;
+      }
+    }
+
+    return null;
+  };
+
   const handeDownload = async (postUrl: string) => {
-    console.log(postUrl)
+    console.log(linkDedector(postUrl));
   }
 
   return (
@@ -27,7 +59,7 @@ export default function App() {
           <TextInput
             value={url}
             onChangeText={setUrl}
-            placeholder="https://www.tiktok.com/..."
+            placeholder="Gönderi Linki"
             placeholderTextColor="#9ca3af"
             className="border border-neutral-200 rounded-xl px-4 py-3 text-neutral-900"
           />
