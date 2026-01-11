@@ -1,11 +1,12 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import ToastManager, { Toast } from 'toastify-react-native'
 import { useState } from "react";
 import './global.css';
 import { Header } from 'components/Header';
 import { Downloader } from 'services/Downloader';
+import TiktokDownload from 'components/TiktokDownload';
 
 export default function App() {
   const [url, setUrl] = useState("");
@@ -53,17 +54,17 @@ export default function App() {
       console.log("TikTok Download Result:", result);
     }
 
-    else if (platform == "instagram") {
-      setPostType("instagram");
-      const result: any = await downloader.instagram(postUrl);
-      setData(result);
-      console.log("Instagram Download Result:", result);
-    }
+    // else if (platform == "instagram") {
+    //   setPostType("instagram");
+    //   const result: any = await downloader.instagram(postUrl);
+    //   setData(result);
+    //   console.log("Instagram Download Result:", result);
+    // }
   }
 
   return (
     <SafeAreaView className='flex-1 bg-neutral-100'>
-      <View className="flex-1 p-5">
+      <ScrollView className="flex-1 p-5" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <Header />
 
@@ -95,13 +96,11 @@ export default function App() {
           </Text>
         </TouchableOpacity>
 
-        {/* Info Box */}
-        <View className="mt-6 bg-neutral-200/50 rounded-xl p-4">
-          <Text className="text-neutral-600 text-sm text-center">
-            Linki yapıştır ve indirmeye başla 🚀
-          </Text>
-        </View>
-      </View>
+        {
+          postType === "tiktok" && data && <TiktokDownload data={data} />
+        }
+
+      </ScrollView>
       <StatusBar style="auto" />
       <ToastManager />
     </SafeAreaView>

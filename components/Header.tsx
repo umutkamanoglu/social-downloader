@@ -7,7 +7,7 @@ export function Header() {
                 Social Vault
             </Text>
             <Text className="text-neutral-500 mt-2">
-                Gönderileri indirmek artık çok kolay..
+                Linki yapıştır ve indirmeye başla 🚀
             </Text>
         </View>
     )
